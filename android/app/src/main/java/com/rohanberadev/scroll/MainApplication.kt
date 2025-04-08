@@ -1,4 +1,4 @@
-package com.rohanbera123.scrollv1
+package com.rohanberadev.scroll
 
 import android.app.Application
 import android.content.res.Configuration

@@ -1,18 +1,19 @@
+import { AppLogo } from "@/components/AppLogo";
 import { MyTextInput } from "@/components/MyTextInput";
-import { icons } from "@/constants/icons";
 import { images } from "@/constants/image";
 import { Link } from "expo-router";
 import { useState } from "react";
 import { Image, Text, TouchableOpacity, View } from "react-native";
+import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 
 export default function SignIn() {
   const [emailValue, setEmailValue] = useState("");
   const [passwordValue, setPasswordValue] = useState("");
 
   return (
-    <View className="flex-1 bg-primary">
-      <Image source={images.bg} className="absolute z-0" />
-      <Image source={icons.logo} className="mt-20 mx-auto" />
+    <KeyboardAwareScrollView className="flex-1 bg-primary" bottomOffset={12}>
+      <Image source={images.bg} className="absolute z-0 w-full" />
+      <AppLogo />
 
       <View className="mt-32 flex-col items-center justify-between px-8">
         <Text className="text-6xl font-semibold text-white italic">
@@ -51,6 +52,6 @@ export default function SignIn() {
           </Text>
         </Link>
       </View>
-    </View>
+    </KeyboardAwareScrollView>
   );
 }

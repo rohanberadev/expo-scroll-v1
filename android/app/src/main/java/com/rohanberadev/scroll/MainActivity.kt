@@ -1,4 +1,4 @@
-package com.rohanbera123.scrollv1
+package com.rohanberadev.scroll
 import expo.modules.splashscreen.SplashScreenManager
 
 import android.os.Build

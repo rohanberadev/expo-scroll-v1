@@ -16,9 +16,9 @@ export const MyTextInput = ({
   return (
     <View className="w-full flex-col gap-y-2">
       <Text className="text-sm text-white font-semibold ml-2">{label}</Text>
-      <View className="bg-dark-200 rounded-lg flex-row py-4 px-2 border-[1px] border-gray-600">
+      <View className="bg-dark-200 rounded-lg flex-row px-2 border-[1px] border-gray-600">
         <TextInput
-          className="flex-1 text-white"
+          className="flex-1 text-white py-4"
           placeholder={placeholder}
           placeholderTextColor="#ab8bff"
           value={value}

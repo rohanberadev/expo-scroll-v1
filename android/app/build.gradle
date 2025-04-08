@@ -86,9 +86,9 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace 'com.rohanbera123.scrollv1'
+    namespace 'com.rohanberadev.scroll'
     defaultConfig {
-        applicationId 'com.rohanbera123.scrollv1'
+        applicationId 'com.rohanberadev.scroll'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
