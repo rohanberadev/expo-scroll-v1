@@ -12,6 +12,13 @@ export default function RootLayout() {
         <Stack>
           <Stack.Screen name="(app)" options={{ headerShown: false }} />
           <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+          <Stack.Screen
+            name="(modal)/post"
+            options={{
+              presentation: "modal",
+              headerShown: false,
+            }}
+          />
         </Stack>
       </KeyboardProvider>
     </SafeAreaView>

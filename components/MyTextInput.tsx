@@ -6,15 +6,17 @@ export const MyTextInput = ({
   value,
   onChangeText,
   secureTextEntry,
+  className,
 }: {
   label: string;
   placeholder: string;
   value: string;
   onChangeText: (text: string) => void;
   secureTextEntry?: boolean;
+  className?: string;
 }) => {
   return (
-    <View className="w-full flex-col gap-y-2">
+    <View className={`w-full flex-col gap-y-2 ${className}`}>
       <Text className="text-sm text-white font-semibold ml-2">{label}</Text>
       <View className="bg-dark-200 rounded-lg flex-row px-2 border-[1px] border-gray-600">
         <TextInput

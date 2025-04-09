@@ -1,4 +1,5 @@
 import { icons } from "@/constants/icons";
+import { Link } from "expo-router";
 import { Image, Text, TouchableOpacity, View } from "react-native";
 
 const imageUrls = [
@@ -8,45 +9,58 @@ const imageUrls = [
 
 export const PostCard = () => {
   return (
-    <View className="w-full flex-col gap-y-2.5">
-      <View className="w-full rounded-xl overflow-hidden relative">
-        <Image
-          source={{
-            uri: imageUrls[0],
-          }}
-          className="w-full h-[400px]"
-          resizeMode="cover"
-        />
+    <Link href="/post" asChild>
+      <TouchableOpacity className="w-full flex-col gap-y-2.5">
+        <View className="w-full rounded-xl overflow-hidden relative">
+          <Image
+            source={{
+              uri: imageUrls[0],
+            }}
+            className="w-full h-[400px]"
+            resizeMode="cover"
+          />
 
-        <View className="absolute bottom-0 bg-black w-full h-16 z-50 opacity-80 flex flex-row items-center justify-between">
-          <View className="flex-row items-center gap-x-2">
-            <View className="ml-2 w-10 h-10 rounded-full overflow-hidden">
-              <Image source={{ uri: imageUrls[1] }} className="w-full h-full" />
+          <View className="absolute bottom-0 bg-black w-full h-16 z-50 opacity-80 flex flex-row items-center justify-between">
+            <View className="flex-row items-center gap-x-2">
+              <View className="ml-2 w-10 h-10 rounded-full overflow-hidden">
+                <Image
+                  source={{ uri: imageUrls[1] }}
+                  className="w-full h-full"
+                />
+              </View>
+
+              <View className="flex-col">
+                <Text className="text-sm text-white font-bold">John Doe</Text>
+                <Text className="text-xs text-white" numberOfLines={1}>
+                  I am in Paris
+                </Text>
+              </View>
             </View>
 
-            <View className="flex-col">
-              <Text className="text-sm text-white font-bold">John Doe</Text>
-              <Text className="text-xs text-white">2025-01-10</Text>
+            <View className="flex-row items-center gap-x-5 mr-4">
+              <TouchableOpacity className="flex-col items-center gap-y-1">
+                <Image
+                  source={icons.heart}
+                  className="size-6"
+                  tintColor="#fff"
+                />
+                <Text className="text-xs text-white">999</Text>
+              </TouchableOpacity>
+
+              <Link href="/post" asChild>
+                <TouchableOpacity className="flex-col items-center gap-y-1">
+                  <Image
+                    source={icons.message}
+                    className="size-6"
+                    tintColor="#fff"
+                  />
+                  <Text className="text-xs text-white">999</Text>
+                </TouchableOpacity>
+              </Link>
             </View>
-          </View>
-
-          <View className="flex-row items-center gap-x-5 mr-4">
-            <TouchableOpacity className="flex-col items-center gap-y-1">
-              <Image source={icons.heart} className="size-6" tintColor="#fff" />
-              <Text className="text-xs text-white">999</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity className="flex-col items-center gap-y-1">
-              <Image
-                source={icons.message}
-                className="size-6"
-                tintColor="#fff"
-              />
-              <Text className="text-xs text-white">999</Text>
-            </TouchableOpacity>
           </View>
         </View>
-      </View>
-    </View>
+      </TouchableOpacity>
+    </Link>
   );
 };
