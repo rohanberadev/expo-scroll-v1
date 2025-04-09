@@ -1,5 +1,7 @@
-import { Slot } from "expo-router";
+import { useAuth } from "@/contexts/auth";
+import { Redirect, Slot } from "expo-router";
 
 export default function AuthLayout() {
-  return <Slot />;
+  const { session } = useAuth();
+  return session ? <Redirect href="/" /> : <Slot />;
 }

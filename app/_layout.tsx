@@ -1,3 +1,4 @@
+import { AuthProvider } from "@/contexts/auth";
 import "@/global.css";
 import { Stack } from "expo-router";
 import { StatusBar } from "react-native";
@@ -6,21 +7,16 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function RootLayout() {
   return (
-    <SafeAreaView className="flex-1 min-h-screen">
-      <StatusBar hidden={true} />
-      <KeyboardProvider>
-        <Stack>
-          <Stack.Screen name="(app)" options={{ headerShown: false }} />
-          <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-          <Stack.Screen
-            name="(modal)/post"
-            options={{
-              presentation: "modal",
-              headerShown: false,
-            }}
-          />
-        </Stack>
-      </KeyboardProvider>
-    </SafeAreaView>
+    <AuthProvider>
+      <SafeAreaView className="flex-1 min-h-screen">
+        <StatusBar hidden={true} />
+        <KeyboardProvider>
+          <Stack>
+            <Stack.Screen name="(app)" options={{ headerShown: false }} />
+            <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+          </Stack>
+        </KeyboardProvider>
+      </SafeAreaView>
+    </AuthProvider>
   );
 }
