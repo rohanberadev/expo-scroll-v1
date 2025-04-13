@@ -1,4 +1,4 @@
-import { Post, UserProfile } from "@/interfaces/appwrite";
+import { Like, Post, UserProfile } from "@/interfaces/appwrite";
 import { prepareNativeFile } from "@/lib/file";
 import { config, database, storage } from "@/services/appwrite";
 import { ImagePickerAsset } from "expo-image-picker";
@@ -97,4 +97,122 @@ export const fetchPostById = ({ id }: { id: string }): Promise<Post> => {
     config.col.posts.id,
     id
   ) as any;
+};
+
+export const fetchLike = async ({
+  userId,
+  postId,
+}: {
+  userId: string;
+  postId: string;
+}) => {
+  const likeAttr = config.col.likes.attr;
+
+  const response = await database.listDocuments(
+    config.databaseId,
+    config.col.likes.id,
+    [
+      Query.and([
+        Query.equal(likeAttr.postId, postId),
+        Query.equal(likeAttr.userId, userId),
+      ]),
+      Query.limit(1),
+    ]
+  );
+
+  if (response.total === 0) return null;
+
+  return response.documents[0];
+};
+
+export const handleLike = async ({
+  postId,
+  userId,
+}: {
+  postId: string;
+  userId: string;
+}): Promise<Like | null> => {
+  const likeAttr = config.col.likes.attr;
+
+  const responsePost = (await database.getDocument(
+    config.databaseId,
+    config.col.posts.id,
+    postId
+  )) as Post;
+
+  if (!responsePost) throw new Error("Failed to fetch post");
+
+  const responseLike = await database.listDocuments(
+    config.databaseId,
+    config.col.likes.id,
+    [
+      Query.and([
+        Query.equal(likeAttr.postId, postId),
+        Query.equal(likeAttr.userId, userId),
+      ]),
+      Query.limit(1),
+    ]
+  );
+
+  if (responseLike.total === 0) {
+    await database.updateDocument(
+      config.databaseId,
+      config.col.posts.id,
+      postId,
+      {
+        ...responsePost,
+        likeCount: responsePost.likeCount + 1,
+      }
+    );
+
+    try {
+      return (await database.createDocument(
+        config.databaseId,
+        config.col.likes.id,
+        ID.unique(),
+        { userId, postId }
+      )) as Like;
+    } catch (error) {
+      await database.updateDocument(
+        config.databaseId,
+        config.col.posts.id,
+        postId,
+        {
+          ...responsePost,
+          likeCount: responsePost.likeCount - 1,
+        }
+      );
+      throw error;
+    }
+  } else {
+    await database.updateDocument(
+      config.databaseId,
+      config.col.posts.id,
+      postId,
+      {
+        ...responsePost,
+        likeCount: responsePost.likeCount - 1,
+      }
+    );
+
+    try {
+      await database.deleteDocument(
+        config.databaseId,
+        config.col.likes.id,
+        responseLike.documents[0].$id
+      );
+      return null;
+    } catch (error) {
+      await database.updateDocument(
+        config.databaseId,
+        config.col.posts.id,
+        postId,
+        {
+          ...responsePost,
+          likeCount: responsePost.likeCount + 1,
+        }
+      );
+      throw error;
+    }
+  }
 };

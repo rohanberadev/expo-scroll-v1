@@ -8,4 +8,5 @@ export const POST_QUERY_TAG = {
   user: "user",
   detail: "detail",
   trending: "trending",
+  like: "like",
 } as const;

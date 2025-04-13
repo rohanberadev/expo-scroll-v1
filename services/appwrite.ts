@@ -17,6 +17,7 @@ const config = {
         profileImage: "profileImage",
       },
     },
+
     posts: {
       id: process.env.EXPO_PUBLIC_APPWRITE_COL_POSTS!,
       attr: {
@@ -26,6 +27,14 @@ const config = {
         title: "title",
         likeCount: "likeCount",
         commentCount: "commentCount",
+      },
+    },
+
+    likes: {
+      id: process.env.EXPO_PUBLIC_APPWRITE_COL_LIKES!,
+      attr: {
+        postId: "postId",
+        userId: "userId",
       },
     },
   },

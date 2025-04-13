@@ -1,4 +1,7 @@
 import { icons } from "@/constants/icons";
+import { useAuth } from "@/contexts/auth";
+import { useFetchLike } from "@/hooks/posts";
+import { useFetchUserProfile } from "@/hooks/userProfiles";
 import { Post } from "@/interfaces/appwrite";
 import { config, storage } from "@/services/appwrite";
 import { Link } from "expo-router";
@@ -10,6 +13,10 @@ const imageUrls = [
 ];
 
 export const PostCard = ({ post }: { post: Post }) => {
+  const { user } = useAuth();
+  const { data: like } = useFetchLike({ postId: post.$id, userId: user?.$id! });
+  const { data: userProfile } = useFetchUserProfile({ userId: user?.$id! });
+
   return (
     <Link href={{ pathname: "/post/[id]", params: { id: post.$id } }} asChild>
       <TouchableOpacity className="w-full flex-col gap-y-2.5">
@@ -27,7 +34,9 @@ export const PostCard = ({ post }: { post: Post }) => {
             <View className="flex-row items-center gap-x-2">
               <View className="ml-2 w-10 h-10 rounded-full overflow-hidden">
                 <Image
-                  source={{ uri: imageUrls[1] }}
+                  source={{
+                    uri: userProfile?.profileImage,
+                  }}
                   className="w-full h-full"
                 />
               </View>

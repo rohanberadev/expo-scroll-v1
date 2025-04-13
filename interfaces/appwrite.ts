@@ -15,3 +15,8 @@ export interface Post extends Models.Document {
   likeCount: number;
   commentCount: number;
 }
+
+export interface Like extends Models.Document {
+  userId: string;
+  postId: string;
+}

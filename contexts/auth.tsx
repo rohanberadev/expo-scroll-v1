@@ -34,6 +34,8 @@ type AuthContextProps = {
   }) => Promise<void>;
 
   signOut: () => Promise<void>;
+
+  refetchUser: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
@@ -136,6 +138,24 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  const refetchUser = async () => {
+    if (!user)
+      throw new Error(
+        "You can't refetch user before the the initilaztion of user"
+      );
+
+    try {
+      setLoading(true);
+
+      const responseUser = await account.get();
+      setUser(responseUser);
+    } catch (error: any) {
+      setError(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const contextData = {
     user,
     session,
@@ -144,6 +164,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     signUp,
     signIn,
     signOut,
+    refetchUser,
   };
 
   return (

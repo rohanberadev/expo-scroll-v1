@@ -1,8 +1,9 @@
 import { icons } from "@/constants/icons";
 import { useAuth } from "@/contexts/auth";
 import { useFetchPostDetails } from "@/hooks/posts";
+import { useFetchUserProfile } from "@/hooks/userProfiles";
 import { config, storage } from "@/services/appwrite";
-import { Redirect, useLocalSearchParams, useRouter } from "expo-router";
+import { Link, Redirect, useLocalSearchParams, useRouter } from "expo-router";
 import React, { useRef, useState } from "react";
 import {
   ActivityIndicator,
@@ -20,9 +21,11 @@ const imageUrls = [
 
 export default function Post() {
   const { id } = useLocalSearchParams();
-  const { user } = useAuth();
-
   const router = useRouter();
+
+  const { user } = useAuth();
+  const { data: userProfile } = useFetchUserProfile({ userId: user?.$id! });
+
   const [commentValue, setCommentValue] = useState("");
   const scrollViewRef = useRef<ScrollView>(null);
 
@@ -44,12 +47,8 @@ export default function Post() {
 
   if (isPostLoading) {
     return (
-      <View className="flex-1 bg-primary">
-        <ActivityIndicator
-          size="large"
-          color="#AB8BFF"
-          className="justify-center items-center"
-        />
+      <View className="flex-1 bg-primary justify-center items-center">
+        <ActivityIndicator size="large" color="#AB8BFF" />
       </View>
     );
   }
@@ -72,15 +71,20 @@ export default function Post() {
         <View className="w-full">
           <View className="w-full p-5 flex-row justify-between items-center">
             <View className="flex-row items-center gap-x-4">
-              <View className="size-12 overflow-hidden rounded-full">
-                <Image
-                  source={{
-                    uri: imageUrls[1],
-                  }}
-                  className="w-full h-full"
-                  resizeMode="cover"
-                />
-              </View>
+              <Link
+                href={{ pathname: "/profile/[id]", params: { id: user?.$id! } }}
+                asChild
+              >
+                <TouchableOpacity className="size-12 overflow-hidden rounded-full">
+                  <Image
+                    source={{
+                      uri: userProfile?.profileImage,
+                    }}
+                    className="w-full h-full"
+                    resizeMode="cover"
+                  />
+                </TouchableOpacity>
+              </Link>
 
               <Text className="text-lg text-white font-bold">
                 {post?.userName}
