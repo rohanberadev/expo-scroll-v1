@@ -1,7 +1,17 @@
 import { icons } from "@/constants/icons";
-import { useRouter } from "expo-router";
+import { useAuth } from "@/contexts/auth";
+import { useFetchPostDetails } from "@/hooks/posts";
+import { config, storage } from "@/services/appwrite";
+import { Redirect, useLocalSearchParams, useRouter } from "expo-router";
 import React, { useRef, useState } from "react";
-import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import {
+  ActivityIndicator,
+  Image,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 const imageUrls = [
   "https://images.pexels.com/photos/29352449/pexels-photo-29352449/free-photo-of-tokyo-tower-illuminated-night-skyline-view.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
@@ -9,12 +19,39 @@ const imageUrls = [
 ];
 
 export default function Post() {
+  const { id } = useLocalSearchParams();
+  const { user } = useAuth();
+
   const router = useRouter();
   const [commentValue, setCommentValue] = useState("");
   const scrollViewRef = useRef<ScrollView>(null);
 
+  const {
+    data: post,
+    error: postError,
+    isLoading: isPostLoading,
+    isError: isPostError,
+    isSuccess: isPostSuccess,
+  } = useFetchPostDetails({ id: id as string });
+
   function scrollToTop() {
     scrollViewRef.current?.scrollTo({ y: 0, animated: true });
+  }
+
+  if (isPostSuccess && !post) {
+    return <Redirect href="/" />;
+  }
+
+  if (isPostLoading) {
+    return (
+      <View className="flex-1 bg-primary">
+        <ActivityIndicator
+          size="large"
+          color="#AB8BFF"
+          className="justify-center items-center"
+        />
+      </View>
+    );
   }
 
   return (
@@ -37,23 +74,34 @@ export default function Post() {
             <View className="flex-row items-center gap-x-4">
               <View className="size-12 overflow-hidden rounded-full">
                 <Image
-                  source={{ uri: imageUrls[1] }}
+                  source={{
+                    uri: imageUrls[1],
+                  }}
                   className="w-full h-full"
                   resizeMode="cover"
                 />
               </View>
 
-              <Text className="text-lg text-white font-bold">John Doe</Text>
+              <Text className="text-lg text-white font-bold">
+                {post?.userName}
+              </Text>
             </View>
-            <TouchableOpacity className="px-8 py-2 justify-center items-center bg-accent rounded-full">
-              <Text className="text-base font-bold">Follow</Text>
-            </TouchableOpacity>
+            {post?.userId !== user?.$id && (
+              <TouchableOpacity className="px-8 py-2 justify-center items-center bg-accent rounded-full">
+                <Text className="text-base font-bold">Follow</Text>
+              </TouchableOpacity>
+            )}
           </View>
 
           <View className="w-full">
             <View className="w-full h-[450px] overflow-hidden rounded-b-xl">
               <Image
-                source={{ uri: imageUrls[0] }}
+                source={{
+                  uri: storage.getFileView(
+                    config.storage.images,
+                    post?.imageId!
+                  ).href,
+                }}
                 className="w-full h-full"
                 resizeMode="stretch"
               />

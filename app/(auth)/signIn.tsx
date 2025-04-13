@@ -61,13 +61,13 @@ export default function SignIn() {
           {loading ? (
             <ActivityIndicator size="small" color="#fff" />
           ) : (
-            <Text className="text-lg font-bold">Sign Up</Text>
+            <Text className="text-lg font-bold">Sign In</Text>
           )}
         </TouchableOpacity>
 
         {error && (
           <Text className="w-full mt-3 pl-2 text-red-600 text-sm font-bold text-left">
-            Error: {error}
+            {error}
           </Text>
         )}
 

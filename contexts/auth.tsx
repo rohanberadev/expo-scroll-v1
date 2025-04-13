@@ -1,6 +1,10 @@
+import { icons } from "@/constants/icons";
+import { images } from "@/constants/image";
 import { account } from "@/services/appwrite";
 import React, { createContext, useContext, useEffect, useState } from "react";
+import { ActivityIndicator, Image, StatusBar, View } from "react-native";
 import { ID } from "react-native-appwrite";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 type Session = Awaited<ReturnType<typeof account.getSession>>;
 type User = Awaited<ReturnType<typeof account.get>>;
@@ -35,27 +39,32 @@ type AuthContextProps = {
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
 
 const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+  const [initialLoading, setInitialLoading] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [session, setSession] = useState<Session>();
   const [user, setUser] = useState<User>();
 
   useEffect(() => {
-    checkAuth();
+    init();
   }, []);
 
-  const checkAuth = async () => {
+  const init = async () => {
     try {
-      const responseSession = await account.getSession("current");
-      setSession(responseSession);
-
-      const responseUser = await account.get();
-      setUser(responseUser);
+      setInitialLoading(true);
+      await checkAuth();
     } catch (error: any) {
-      // setError(error.message);
     } finally {
-      setLoading(false);
+      setInitialLoading(false);
     }
+  };
+
+  const checkAuth = async () => {
+    const responseSession = await account.getSession("current");
+    setSession(responseSession);
+
+    const responseUser = await account.get();
+    setUser(responseUser);
   };
 
   const signUp = async ({
@@ -138,7 +147,24 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={contextData}>{children}</AuthContext.Provider>
+    <AuthContext.Provider value={contextData}>
+      {initialLoading ? (
+        <SafeAreaView className="flex-1">
+          <View className="flex-1 bg-primary">
+            <Image source={images.bg} className="absolute z-0 w-full" />
+            <Image
+              source={icons.logo}
+              className="w-12 h-10 mb-5 mx-auto mt-20"
+            />
+
+            <ActivityIndicator size="large" color="#0000ff" className="mt-10" />
+          </View>
+          <StatusBar hidden={true} />
+        </SafeAreaView>
+      ) : (
+        children
+      )}
+    </AuthContext.Provider>
   );
 };
 

@@ -80,7 +80,7 @@ export default function SignUp() {
 
         {error && (
           <Text className="w-full mt-3 pl-2 text-red-600 text-sm font-bold text-left">
-            Error: {error}
+            {error}
           </Text>
         )}
 
