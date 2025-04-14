@@ -4,6 +4,7 @@ import heart from "@/assets/icons/heart.png";
 import heartFill from "@/assets/icons/heart_fill.png";
 import home from "@/assets/icons/home.png";
 import logo from "@/assets/icons/logo.png";
+import logout from "@/assets/icons/logout.png";
 import message from "@/assets/icons/message.png";
 import person from "@/assets/icons/person.png";
 import play from "@/assets/icons/play.png";
@@ -26,4 +27,5 @@ export const icons = {
   message,
   chevron,
   heartFill,
+  logout,
 } as const;

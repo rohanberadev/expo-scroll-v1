@@ -5,11 +5,6 @@ import MaskedView from "@react-native-masked-view/masked-view";
 import { Link } from "expo-router";
 import { Image, Text, TouchableOpacity, View } from "react-native";
 
-const imageUrls = [
-  "https://images.pexels.com/photos/29352449/pexels-photo-29352449/free-photo-of-tokyo-tower-illuminated-night-skyline-view.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
-  "https://plus.unsplash.com/premium_photo-1664474619075-644dd191935f?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8aW1hZ2V8ZW58MHx8MHx8fDA%3D",
-];
-
 export const TrendingPostCard = ({
   post,
   ranking,

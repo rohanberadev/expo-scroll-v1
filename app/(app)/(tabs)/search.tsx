@@ -14,11 +14,6 @@ import {
   View,
 } from "react-native";
 
-const imageUrls = [
-  "https://images.pexels.com/photos/29352449/pexels-photo-29352449/free-photo-of-tokyo-tower-illuminated-night-skyline-view.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
-  "https://plus.unsplash.com/premium_photo-1664474619075-644dd191935f?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8aW1hZ2V8ZW58MHx8MHx8fDA%3D",
-];
-
 export default function Search() {
   const [debounceSearchQuery, setDebounceSearchQuery] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
@@ -51,7 +46,7 @@ export default function Search() {
         contentContainerStyle={{ paddingBottom: 30 }}
         ListEmptyComponent={
           !isLoading && !isError ? (
-            <Text className="text-lg text-center text-light-300 font-bold mt-10">
+            <Text className="text-sm text-center text-light-300 font-bold mt-10">
               Search people name
             </Text>
           ) : null
@@ -93,17 +88,26 @@ export default function Search() {
 
 const UserPorfileCard = ({ user }: { user: UserProfile }) => {
   return (
-    <Link href="/" asChild>
+    <Link
+      href={{ pathname: "/profile/[id]", params: { id: user.userId } }}
+      asChild
+    >
       <TouchableOpacity className="w-full p-5 flex-row items-center gap-x-4 border-b-[1px] border-gray-600">
         <View className="size-12 rounded-full overflow-hidden">
-          <Image
-            source={{
-              uri: user.profileImage ? user.profileImage : imageUrls[1],
-            }}
-            className="w-full h-full"
-          />
+          {user.profileImage ? (
+            <Image
+              source={{
+                uri: user.profileImage,
+              }}
+              className="w-full h-full"
+            />
+          ) : (
+            <Image
+              source={images.placeholderProfile}
+              className="w-full h-full"
+            />
+          )}
         </View>
-        <Text className="text-xs text-white">{user.profileImage}</Text>
         <Text className="text-lg text-white font-bold">{user.name}</Text>
       </TouchableOpacity>
     </Link>

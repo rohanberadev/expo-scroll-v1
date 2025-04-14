@@ -1,4 +1,5 @@
 import { icons } from "@/constants/icons";
+import { images } from "@/constants/image";
 import { useAuth } from "@/contexts/auth";
 import {
   useFetchLike,
@@ -18,8 +19,15 @@ export const PostCard = ({ post }: { post: Post }) => {
     id: post.$id,
     initialData: post,
   });
-  const { data: like } = useFetchLike({ postId: post.$id, userId: user?.$id! });
-  const { data: userProfile } = useFetchUserProfile({ userId: user?.$id! });
+  const { data: like, isSuccess: isLikeSuccess } = useFetchLike({
+    postId: post.$id,
+    userId: user?.$id!,
+  });
+  const {
+    data: userProfile,
+    isSuccess: isUserProfileSuccess,
+    isLoading: isUserProfileLoading,
+  } = useFetchUserProfile({ userId: post.userId! });
   const { mutateAsync: handleLike, isPending: ishandleLikePending } =
     useHandleLike({
       postId: postDetails?.$id!,
@@ -44,12 +52,26 @@ export const PostCard = ({ post }: { post: Post }) => {
           <View className="absolute bottom-0 bg-black w-full h-16 z-50 opacity-80 flex flex-row items-center justify-between">
             <View className="flex-row items-center gap-x-2">
               <View className="ml-2 w-10 h-10 rounded-full overflow-hidden">
-                <Image
-                  source={{
-                    uri: userProfile?.profileImage,
-                  }}
-                  className="w-full h-full"
-                />
+                {isUserProfileLoading && (
+                  <Image
+                    source={images.placeholderProfile}
+                    className="w-full h-full"
+                  />
+                )}
+
+                {userProfile?.profileImage &&
+                isUserProfileSuccess &&
+                !isUserProfileLoading ? (
+                  <Image
+                    source={{ uri: userProfile.profileImage }}
+                    className="w-full h-full"
+                  />
+                ) : (
+                  <Image
+                    source={images.placeholderProfile}
+                    className="w-full h-full"
+                  />
+                )}
               </View>
 
               <View className="flex-col">
@@ -70,7 +92,7 @@ export const PostCard = ({ post }: { post: Post }) => {
                       await handleLike();
                     }
                   }}
-                  disabled={ishandleLikePending}
+                  disabled={ishandleLikePending || !isLikeSuccess}
                 >
                   {like ? (
                     <Image source={icons.heartFill} className="size-6" />
@@ -90,7 +112,7 @@ export const PostCard = ({ post }: { post: Post }) => {
 
               <View className="flex-col items-center gap-y-1">
                 <Link
-                  href={{ pathname: "/post/[id]", params: { id: "123" } }}
+                  href={{ pathname: "/post/[id]", params: { id: post.$id } }}
                   asChild
                 >
                   <TouchableOpacity>

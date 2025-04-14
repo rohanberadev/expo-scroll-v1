@@ -10,11 +10,6 @@ import * as ImagePicker from "expo-image-picker";
 import { Link } from "expo-router";
 import { FlatList, Image, Text, TouchableOpacity, View } from "react-native";
 
-const imageUrls = [
-  "https://images.pexels.com/photos/29352449/pexels-photo-29352449/free-photo-of-tokyo-tower-illuminated-night-skyline-view.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
-  "https://plus.unsplash.com/premium_photo-1664474619075-644dd191935f?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8aW1hZ2V8ZW58MHx8MHx8fDA%3D",
-];
-
 export default function MyProfile() {
   const { signOut, user, refetchUser } = useAuth();
 
@@ -57,13 +52,27 @@ export default function MyProfile() {
             <Image source={images.bg} className="absolute z-0 w-full" />
             <AppLogo />
 
+            <TouchableOpacity
+              className="absolute z-50 top-8 right-10 bg-dark-200 p-3 rounded-full"
+              onPress={signOut}
+            >
+              <Image source={icons.logout} tintColor="red" className="size-5" />
+            </TouchableOpacity>
+
             <View className="px-5 mt-20 items-center">
-              <View className="reltaive">
+              <View className="relative">
                 <View className="size-32 overflow-hidden rounded-full border-[2px] border-white">
-                  <Image
-                    source={{ uri: user?.prefs.profileImage }}
-                    className="w-full h-full"
-                  />
+                  {user?.prefs.profileImage ? (
+                    <Image
+                      source={{ uri: user?.prefs.profileImage }}
+                      className="w-full h-full"
+                    />
+                  ) : (
+                    <Image
+                      source={images.placeholderProfile}
+                      className="w-full h-full"
+                    />
+                  )}
                 </View>
                 <TouchableOpacity
                   className="p-2 bg-accent rounded-full absolute bottom-0 right-0"
@@ -85,10 +94,40 @@ export default function MyProfile() {
             <View className="w-full h-[1px] bg-gray-700 my-5"></View>
 
             <View className="px-5">
-              <Text className="text-lg text-white font-bold">Your Posts</Text>
+              <TouchableOpacity className="flex-row items-center gap-x-0.5 mb-5">
+                <Text className="text-lg text-white font-bold">
+                  Your Followers
+                </Text>
+
+                <Image
+                  source={icons.chevron}
+                  tintColor="#fff"
+                  className="size-6 rotate-180 mt-0.5"
+                />
+              </TouchableOpacity>
+
+              <UserCard />
             </View>
 
-            <View className="px-5 mt-5"></View>
+            <View className="px-5 mt-5">
+              <TouchableOpacity className="flex-row items-center gap-x-0.5 mb-5">
+                <Text className="text-lg text-white font-bold">
+                  Your Followings
+                </Text>
+
+                <Image
+                  source={icons.chevron}
+                  tintColor="#fff"
+                  className="size-6 rotate-180 mt-0.5"
+                />
+              </TouchableOpacity>
+
+              <UserCard />
+            </View>
+
+            <View className="px-5 w-full my-5">
+              <Text className="text-lg text-white font-bold">Your Posts</Text>
+            </View>
           </>
         }
         ListFooterComponent={<View className="w-full h-32"></View>}
@@ -116,5 +155,17 @@ const PostCard = ({ post }: { post: Post }) => {
         </Text>
       </TouchableOpacity>
     </Link>
+  );
+};
+
+const UserCard = () => {
+  return (
+    <TouchableOpacity className="w-24 h-28 overflow-hidden border-[1px] border-gray-600 rounded-lg relative">
+      <Image source={images.placeholderProfile} className="w-full h-full" />
+
+      <View className="z-50 absolute w-full bottom-0 justify-center items-center py-2 bg-black opacity-60">
+        <Text className="text-sm text-white font-bold">Test 1</Text>
+      </View>
+    </TouchableOpacity>
   );
 };

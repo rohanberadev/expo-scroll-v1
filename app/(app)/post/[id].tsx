@@ -1,4 +1,5 @@
 import { icons } from "@/constants/icons";
+import { images } from "@/constants/image";
 import { useAuth } from "@/contexts/auth";
 import {
   useFetchLike,
@@ -18,17 +19,11 @@ import {
   View,
 } from "react-native";
 
-const imageUrls = [
-  "https://images.pexels.com/photos/29352449/pexels-photo-29352449/free-photo-of-tokyo-tower-illuminated-night-skyline-view.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
-  "https://plus.unsplash.com/premium_photo-1664474619075-644dd191935f?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8aW1hZ2V8ZW58MHx8MHx8fDA%3D",
-];
-
 export default function Post() {
   const { id } = useLocalSearchParams();
   const router = useRouter();
 
   const { user } = useAuth();
-  const { data: userProfile } = useFetchUserProfile({ userId: user?.$id! });
 
   const [commentValue, setCommentValue] = useState("");
   const scrollViewRef = useRef<ScrollView>(null);
@@ -40,6 +35,12 @@ export default function Post() {
     isError: isPostError,
     isSuccess: isPostSuccess,
   } = useFetchPostDetails({ id: id as string });
+
+  const {
+    data: userProfile,
+    isLoading: isUserProfileLoading,
+    isSuccess: isUserProfileSuccess,
+  } = useFetchUserProfile({ userId: post?.userId! });
 
   const { data: like } = useFetchLike({
     postId: post?.$id!,
@@ -69,34 +70,50 @@ export default function Post() {
 
   return (
     <View className="flex-1 bg-primary">
+      <View className="z-50 flex-row items-center gap-x-2 border-b-[1px] border-light-300 w-full h-20">
+        <TouchableOpacity onPress={() => router.back()} className="ml-2">
+          <Image
+            source={icons.chevron}
+            className=" size-8 mt-1"
+            tintColor="#fff"
+          />
+        </TouchableOpacity>
+
+        <Text className="text-xl text-white font-bold">Post</Text>
+      </View>
+
       <ScrollView ref={scrollViewRef}>
-        <View className="fixed z-50 flex-row items-center gap-x-2 border-b-[1px] border-light-300 w-full h-20">
-          <TouchableOpacity onPress={() => router.back()} className="ml-2">
-            <Image
-              source={icons.chevron}
-              className=" size-8 mt-1"
-              tintColor="#fff"
-            />
-          </TouchableOpacity>
-
-          <Text className="text-xl text-white font-bold">Post</Text>
-        </View>
-
         <View className="w-full">
           <View className="w-full p-5 flex-row justify-between items-center">
             <View className="flex-row items-center gap-x-4">
               <Link
-                href={{ pathname: "/profile/[id]", params: { id: user?.$id! } }}
+                href={{
+                  pathname: "/profile/[id]",
+                  params: { id: post?.userId! },
+                }}
                 asChild
               >
                 <TouchableOpacity className="size-12 overflow-hidden rounded-full">
-                  <Image
-                    source={{
-                      uri: userProfile?.profileImage,
-                    }}
-                    className="w-full h-full"
-                    resizeMode="cover"
-                  />
+                  {isUserProfileLoading && (
+                    <Image
+                      source={images.placeholderProfile}
+                      className="w-full h-full"
+                    />
+                  )}
+
+                  {userProfile?.profileImage &&
+                  isUserProfileSuccess &&
+                  !isUserProfileLoading ? (
+                    <Image
+                      source={{ uri: userProfile.profileImage }}
+                      className="w-full h-full"
+                    />
+                  ) : (
+                    <Image
+                      source={images.placeholderProfile}
+                      className="w-full h-full"
+                    />
+                  )}
                 </TouchableOpacity>
               </Link>
 
