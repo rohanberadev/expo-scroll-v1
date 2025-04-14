@@ -3,14 +3,12 @@ import { PostCard } from "@/components/PostCard";
 import { Searchbar } from "@/components/SearchBar";
 import { TrendingPostCard } from "@/components/TrendingPostCard";
 import { images } from "@/constants/image";
-import { useAuth } from "@/contexts/auth";
 import { useFetchLatestPosts, useFetchTrendingPosts } from "@/hooks/posts";
 import { useRouter } from "expo-router";
 import { FlatList, Image, Keyboard, Text, View } from "react-native";
 
 export default function Index() {
   const router = useRouter();
-  const { user } = useAuth();
 
   const {
     data: latestPosts,
@@ -18,7 +16,7 @@ export default function Index() {
     isError: isLatestPostsError,
     isSuccess: isLatestPostsSuccess,
     isLoading: isLatestPostsLoading,
-  } = useFetchLatestPosts({ userId: user?.$id! });
+  } = useFetchLatestPosts();
 
   const {
     data: trendingPosts,

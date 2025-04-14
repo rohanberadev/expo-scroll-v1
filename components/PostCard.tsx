@@ -1,21 +1,30 @@
 import { icons } from "@/constants/icons";
 import { useAuth } from "@/contexts/auth";
-import { useFetchLike } from "@/hooks/posts";
+import {
+  useFetchLike,
+  useFetchPostDetails,
+  useHandleLike,
+} from "@/hooks/posts";
 import { useFetchUserProfile } from "@/hooks/userProfiles";
 import { Post } from "@/interfaces/appwrite";
 import { config, storage } from "@/services/appwrite";
 import { Link } from "expo-router";
 import { Image, Text, TouchableOpacity, View } from "react-native";
 
-const imageUrls = [
-  "https://images.pexels.com/photos/29352449/pexels-photo-29352449/free-photo-of-tokyo-tower-illuminated-night-skyline-view.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
-  "https://plus.unsplash.com/premium_photo-1664474619075-644dd191935f?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8aW1hZ2V8ZW58MHx8MHx8fDA%3D",
-];
-
 export const PostCard = ({ post }: { post: Post }) => {
   const { user } = useAuth();
+
+  const { data: postDetails } = useFetchPostDetails({
+    id: post.$id,
+    initialData: post,
+  });
   const { data: like } = useFetchLike({ postId: post.$id, userId: user?.$id! });
   const { data: userProfile } = useFetchUserProfile({ userId: user?.$id! });
+  const { mutateAsync: handleLike, isPending: ishandleLikePending } =
+    useHandleLike({
+      postId: postDetails?.$id!,
+      userId: user?.$id!,
+    });
 
   return (
     <Link href={{ pathname: "/post/[id]", params: { id: post.$id } }} asChild>
@@ -23,8 +32,10 @@ export const PostCard = ({ post }: { post: Post }) => {
         <View className="w-full rounded-xl overflow-hidden relative">
           <Image
             source={{
-              uri: storage.getFileView(config.storage.images, post.imageId)
-                .href,
+              uri: storage.getFileView(
+                config.storage.images,
+                postDetails?.imageId!
+              ).href,
             }}
             className="w-full h-[400px]"
             resizeMode="cover"
@@ -43,25 +54,38 @@ export const PostCard = ({ post }: { post: Post }) => {
 
               <View className="flex-col">
                 <Text className="text-sm text-white font-bold">
-                  {post.userName}
+                  {postDetails?.userName}
                 </Text>
                 <Text className="text-xs text-white" numberOfLines={1}>
-                  {post.title}
+                  {postDetails?.title}
                 </Text>
               </View>
             </View>
 
             <View className="flex-row items-center gap-x-5 mr-4">
               <View className="flex-col items-center gap-y-1">
-                <TouchableOpacity>
-                  <Image
-                    source={icons.heart}
-                    className="size-6"
-                    tintColor="#fff"
-                  />
+                <TouchableOpacity
+                  onPress={async () => {
+                    if (user?.$id && postDetails?.$id) {
+                      await handleLike();
+                    }
+                  }}
+                  disabled={ishandleLikePending}
+                >
+                  {like ? (
+                    <Image source={icons.heartFill} className="size-6" />
+                  ) : (
+                    <Image
+                      source={icons.heart}
+                      className="size-7"
+                      tintColor="#fff"
+                    />
+                  )}
                 </TouchableOpacity>
 
-                <Text className="text-xs text-white">{post.likeCount}</Text>
+                <Text className="text-xs text-white">
+                  {postDetails?.likeCount}
+                </Text>
               </View>
 
               <View className="flex-col items-center gap-y-1">
@@ -78,7 +102,9 @@ export const PostCard = ({ post }: { post: Post }) => {
                   </TouchableOpacity>
                 </Link>
 
-                <Text className="text-xs text-white">{post.commentCount}</Text>
+                <Text className="text-xs text-white">
+                  {postDetails?.commentCount}
+                </Text>
               </View>
             </View>
           </View>

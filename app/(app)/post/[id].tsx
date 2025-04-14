@@ -1,6 +1,10 @@
 import { icons } from "@/constants/icons";
 import { useAuth } from "@/contexts/auth";
-import { useFetchPostDetails } from "@/hooks/posts";
+import {
+  useFetchLike,
+  useFetchPostDetails,
+  useHandleLike,
+} from "@/hooks/posts";
 import { useFetchUserProfile } from "@/hooks/userProfiles";
 import { config, storage } from "@/services/appwrite";
 import { Link, Redirect, useLocalSearchParams, useRouter } from "expo-router";
@@ -36,6 +40,16 @@ export default function Post() {
     isError: isPostError,
     isSuccess: isPostSuccess,
   } = useFetchPostDetails({ id: id as string });
+
+  const { data: like } = useFetchLike({
+    postId: post?.$id!,
+    userId: user?.$id!,
+  });
+  const { mutateAsync: handleLike, isPending: ishandleLikePending } =
+    useHandleLike({
+      postId: post?.$id!,
+      userId: user?.$id!,
+    });
 
   function scrollToTop() {
     scrollViewRef.current?.scrollTo({ y: 0, animated: true });
@@ -111,8 +125,24 @@ export default function Post() {
               />
             </View>
 
-            <TouchableOpacity className="size-12 flex justify-center items-center bg-black absolute top-5 right-5 rounded-full">
-              <Image source={icons.heart} tintColor="#fff" className="size-6" />
+            <TouchableOpacity
+              className="size-12 flex justify-center items-center bg-black absolute top-5 right-5 rounded-full"
+              disabled={ishandleLikePending}
+              onPress={async () => {
+                if (user?.$id && post?.$id) {
+                  await handleLike();
+                }
+              }}
+            >
+              {like ? (
+                <Image source={icons.heartFill} className="size-6" />
+              ) : (
+                <Image
+                  source={icons.heart}
+                  className="size-7"
+                  tintColor="#fff"
+                />
+              )}
             </TouchableOpacity>
           </View>
 

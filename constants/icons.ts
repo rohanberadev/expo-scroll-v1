@@ -1,6 +1,7 @@
 import arrow from "@/assets/icons/arrow.png";
 import chevron from "@/assets/icons/chevron.png";
 import heart from "@/assets/icons/heart.png";
+import heartFill from "@/assets/icons/heart_fill.png";
 import home from "@/assets/icons/home.png";
 import logo from "@/assets/icons/logo.png";
 import message from "@/assets/icons/message.png";
@@ -24,4 +25,5 @@ export const icons = {
   heart,
   message,
   chevron,
+  heartFill,
 } as const;

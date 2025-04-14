@@ -140,8 +140,6 @@ export const handleLike = async ({
     postId
   )) as Post;
 
-  if (!responsePost) throw new Error("Failed to fetch post");
-
   const responseLike = await database.listDocuments(
     config.databaseId,
     config.col.likes.id,
@@ -158,9 +156,8 @@ export const handleLike = async ({
     await database.updateDocument(
       config.databaseId,
       config.col.posts.id,
-      postId,
+      responsePost.$id,
       {
-        ...responsePost,
         likeCount: responsePost.likeCount + 1,
       }
     );
@@ -171,14 +168,13 @@ export const handleLike = async ({
         config.col.likes.id,
         ID.unique(),
         { userId, postId }
-      )) as Like;
+      )) as unknown as Like;
     } catch (error) {
       await database.updateDocument(
         config.databaseId,
         config.col.posts.id,
-        postId,
+        responsePost.$id,
         {
-          ...responsePost,
           likeCount: responsePost.likeCount - 1,
         }
       );
@@ -188,9 +184,8 @@ export const handleLike = async ({
     await database.updateDocument(
       config.databaseId,
       config.col.posts.id,
-      postId,
+      responsePost.$id,
       {
-        ...responsePost,
         likeCount: responsePost.likeCount - 1,
       }
     );
@@ -206,9 +201,8 @@ export const handleLike = async ({
       await database.updateDocument(
         config.databaseId,
         config.col.posts.id,
-        postId,
+        responsePost.$id,
         {
-          ...responsePost,
           likeCount: responsePost.likeCount + 1,
         }
       );

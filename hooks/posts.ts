@@ -50,27 +50,20 @@ export const useFetchPostsByUserId = ({ userId }: { userId: string }) => {
   });
 };
 
-export const useFetchLatestPosts = ({ userId }: { userId: string }) => {
-  const queryClient = useQueryClient();
-
+export const useFetchLatestPosts = () => {
   return useQuery({
     queryKey: [QUERY_KEY.posts, POST_QUERY_TAG.latest],
-    queryFn: async () => {
-      const posts = await fetchPosts({});
-
-      for (const post of posts) {
-        queryClient.setQueryData<Post>(
-          [QUERY_KEY.posts, POST_QUERY_TAG.detail, post.$id],
-          post
-        );
-      }
-      return posts;
-    },
-    enabled: Boolean(userId),
+    queryFn: async () => fetchPosts({}),
   });
 };
 
-export const useFetchPostDetails = ({ id }: { id: string }) => {
+export const useFetchPostDetails = ({
+  id,
+  initialData,
+}: {
+  id: string;
+  initialData?: Post;
+}) => {
   const queryClient = useQueryClient();
 
   return useQuery({
@@ -86,6 +79,7 @@ export const useFetchPostDetails = ({ id }: { id: string }) => {
 
       return await fetchPostById({ id });
     },
+    initialData: initialData,
   });
 };
 
@@ -106,6 +100,7 @@ export const useFetchLike = ({
   return useQuery({
     queryKey: [QUERY_KEY.posts, POST_QUERY_TAG.like, postId],
     queryFn: () => fetchLike({ userId, postId }),
+    enabled: Boolean(postId && userId),
   });
 };
 
@@ -118,7 +113,6 @@ export const useHandleLike = ({
 }) => {
   const queryClient = useQueryClient();
   const likeQueryKey = [QUERY_KEY.posts, POST_QUERY_TAG.like, postId];
-  const latestPostsQueryKey = [QUERY_KEY.posts, POST_QUERY_TAG.latest];
   const postDetailQueryKey = [QUERY_KEY.posts, POST_QUERY_TAG.detail, postId];
 
   return useMutation({
@@ -126,7 +120,6 @@ export const useHandleLike = ({
 
     onMutate: async () => {
       await queryClient.cancelQueries({ queryKey: likeQueryKey });
-      await queryClient.cancelQueries({ queryKey: latestPostsQueryKey });
       await queryClient.cancelQueries({ queryKey: postDetailQueryKey });
 
       const prevLike = queryClient.getQueryData(likeQueryKey) as Like;
@@ -137,10 +130,6 @@ export const useHandleLike = ({
         postId,
       ]) as Post;
 
-      const prevLatestPosts = queryClient.getQueryData(
-        latestPostsQueryKey
-      ) as Post[];
-
       if (prevLike) {
         queryClient.setQueryData(likeQueryKey, null);
 
@@ -148,15 +137,6 @@ export const useHandleLike = ({
           ...prevPostDetail,
           likeCount: prevPostDetail.likeCount - 1,
         });
-
-        queryClient.setQueryData(
-          latestPostsQueryKey,
-          prevLatestPosts.map((post) =>
-            post.$id === postId
-              ? { ...post, likeCount: post.likeCount - 1 }
-              : post
-          )
-        );
       } else {
         queryClient.setQueryData(likeQueryKey, { userId, postId });
 
@@ -164,25 +144,18 @@ export const useHandleLike = ({
           ...prevPostDetail,
           likeCount: prevPostDetail.likeCount + 1,
         });
-
-        queryClient.setQueryData(
-          latestPostsQueryKey,
-          prevLatestPosts.map((post) =>
-            post.$id === postId
-              ? { ...post, likeCount: post.likeCount + 1 }
-              : post
-          )
-        );
       }
 
-      return { prevLike, prevPostDetail, prevLatestPosts };
+      return { prevLike, prevPostDetail };
     },
 
     onError: (err, variables, context) => {
       if (context) {
-        queryClient.setQueryData(likeQueryKey, context.prevLike);
-        queryClient.setQueryData(postDetailQueryKey, context.prevPostDetail);
-        queryClient.setQueryData(latestPostsQueryKey, context.prevLatestPosts);
+        queryClient.setQueryData(likeQueryKey, context.prevLike ?? null);
+        queryClient.setQueryData(
+          postDetailQueryKey,
+          context.prevPostDetail ?? null
+        );
       }
     },
 
