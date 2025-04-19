@@ -12,7 +12,7 @@ export default function RootLayout() {
   return (
     <AuthProvider>
       <QueryClientProvider client={queryClient}>
-        <SafeAreaView className="flex-1 min-h-screen">
+        <SafeAreaView className="flex-1">
           <StatusBar hidden={true} />
           <KeyboardProvider>
             <Stack>

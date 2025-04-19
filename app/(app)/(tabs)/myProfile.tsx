@@ -3,18 +3,37 @@ import { icons } from "@/constants/icons";
 import { images } from "@/constants/image";
 import { useAuth } from "@/contexts/auth";
 import { uploadImage } from "@/data/appwrite";
+import { useFetchFollowers, useFetchFollowings } from "@/hooks/follows";
 import { useFetchPostsByUserId } from "@/hooks/posts";
+import { useFetchUserProfile } from "@/hooks/userProfiles";
 import { Post } from "@/interfaces/appwrite";
 import { account, config, storage } from "@/services/appwrite";
 import * as ImagePicker from "expo-image-picker";
 import { Link } from "expo-router";
-import { FlatList, Image, Text, TouchableOpacity, View } from "react-native";
+import {
+  FlatList,
+  Image,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 export default function MyProfile() {
   const { signOut, user, refetchUser } = useAuth();
 
   const { data: posts, isSuccess } = useFetchPostsByUserId({
     userId: user?.$id!,
+  });
+
+  const { data: followings } = useFetchFollowings({
+    userId: user?.$id!,
+    limit: 5,
+  });
+
+  const { data: followers } = useFetchFollowers({
+    userId: user?.$id!,
+    limit: 5,
   });
 
   const pickImage = async () => {
@@ -93,9 +112,15 @@ export default function MyProfile() {
 
             <View className="w-full h-[1px] bg-gray-700 my-5"></View>
 
-            <View className="px-5">
-              <TouchableOpacity className="flex-row items-center gap-x-0.5 mb-5">
-                <Text className="text-lg text-white font-bold">
+            <Link
+              href={{
+                pathname: "/followers/[userId]",
+                params: { userId: user?.$id },
+              }}
+              asChild
+            >
+              <TouchableOpacity className="flex-row items-center gap-x-0.5 mb-5 px-5">
+                <Text className="text-base text-white font-bold">
                   Your Followers
                 </Text>
 
@@ -105,13 +130,29 @@ export default function MyProfile() {
                   className="size-6 rotate-180 mt-0.5"
                 />
               </TouchableOpacity>
+            </Link>
 
-              <UserCard />
-            </View>
+            <ScrollView className="px-5" horizontal={true}>
+              {followers?.length === 0 || !followers ? (
+                <Text className="text-sm text-light-300">
+                  Nothing to see here.
+                </Text>
+              ) : (
+                followers?.map((follower) => (
+                  <UserCard key={follower.$id} userId={follower.followingId} />
+                ))
+              )}
+            </ScrollView>
 
-            <View className="px-5 mt-5">
-              <TouchableOpacity className="flex-row items-center gap-x-0.5 mb-5">
-                <Text className="text-lg text-white font-bold">
+            <Link
+              href={{
+                pathname: "/followings/[userId]",
+                params: { userId: user?.$id },
+              }}
+              asChild
+            >
+              <TouchableOpacity className="flex-row items-center gap-x-0.5 my-5 px-5">
+                <Text className="text-base text-white font-bold">
                   Your Followings
                 </Text>
 
@@ -121,12 +162,22 @@ export default function MyProfile() {
                   className="size-6 rotate-180 mt-0.5"
                 />
               </TouchableOpacity>
+            </Link>
 
-              <UserCard />
-            </View>
+            <ScrollView className="px-5" horizontal={true}>
+              {followings?.length === 0 || !followings ? (
+                <Text className="text-sm text-light-300">
+                  Nothing to see here.
+                </Text>
+              ) : (
+                followings?.map((following) => (
+                  <UserCard key={following.$id} userId={following.followerId} />
+                ))
+              )}
+            </ScrollView>
 
-            <View className="px-5 w-full my-5">
-              <Text className="text-lg text-white font-bold">Your Posts</Text>
+            <View className="px-5 w-full mt-10 mb-5">
+              <Text className="text-base text-white font-bold">Your Posts</Text>
             </View>
           </>
         }
@@ -158,14 +209,27 @@ const PostCard = ({ post }: { post: Post }) => {
   );
 };
 
-const UserCard = () => {
-  return (
-    <TouchableOpacity className="w-24 h-28 overflow-hidden border-[1px] border-gray-600 rounded-lg relative">
-      <Image source={images.placeholderProfile} className="w-full h-full" />
+const UserCard = ({ userId }: { userId: string }) => {
+  const { data: userProfile } = useFetchUserProfile({ userId });
 
-      <View className="z-50 absolute w-full bottom-0 justify-center items-center py-2 bg-black opacity-60">
-        <Text className="text-sm text-white font-bold">Test 1</Text>
-      </View>
-    </TouchableOpacity>
+  return (
+    <Link href={{ pathname: "/profile/[id]", params: { id: userId } }} asChild>
+      <TouchableOpacity className="w-24 h-28 overflow-hidden border-[1px] border-gray-600 rounded-lg relative">
+        {userProfile?.profileImage ? (
+          <Image
+            source={{ uri: userProfile.profileImage }}
+            className="w-full h-full"
+          />
+        ) : (
+          <Image source={images.placeholderProfile} className="w-full h-full" />
+        )}
+
+        <View className="z-50 absolute w-full bottom-0 justify-center items-center py-2 bg-black opacity-60">
+          <Text className="text-sm text-white font-bold">
+            {userProfile?.name}
+          </Text>
+        </View>
+      </TouchableOpacity>
+    </Link>
   );
 };

@@ -1,14 +1,25 @@
-import { Like, Post, UserProfile } from "@/interfaces/appwrite";
+import { Follow, Like, Post, UserProfile } from "@/interfaces/appwrite";
 import { prepareNativeFile } from "@/lib/file";
 import { config, database, storage } from "@/services/appwrite";
 import { ImagePickerAsset } from "expo-image-picker";
 import { ID, Permission, Query, Role } from "react-native-appwrite";
 
-export const fetchUserProfiles = async ({ query }: { query: string }) => {
+export const fetchUserProfiles = async ({
+  query,
+  myUserId,
+}: {
+  query: string;
+  myUserId: string;
+}) => {
   const response = await database.listDocuments(
     config.databaseId,
     config.col.userProfiles.id,
-    [Query.contains(config.col.userProfiles.attr.name, query)]
+    [
+      Query.and([
+        Query.contains(config.col.userProfiles.attr.name, query),
+        Query.notEqual(config.col.userProfiles.attr.userId, myUserId),
+      ]),
+    ]
   );
 
   return response.documents as unknown as UserProfile[];
@@ -208,5 +219,120 @@ export const handleLike = async ({
       );
       throw error;
     }
+  }
+};
+
+export const fetchFollowing = async ({
+  myUserId,
+  userId,
+}: {
+  myUserId: string;
+  userId: string;
+}) => {
+  const followsAttr = config.col.follows.attr;
+
+  const response = await database.listDocuments(
+    config.databaseId,
+    config.col.follows.id,
+    [
+      Query.and([
+        Query.equal(followsAttr.followerId, userId),
+        Query.equal(followsAttr.followingId, myUserId),
+      ]),
+      Query.limit(1),
+    ]
+  );
+
+  if (response.total === 0) return null;
+
+  return response.documents[0] as Follow;
+};
+
+export const fetchFollowers = async ({
+  userId,
+  limit,
+}: {
+  userId: string;
+  limit?: number;
+}) => {
+  const followsAttr = config.col.follows.attr;
+
+  const query = [Query.equal(followsAttr.followerId, userId)];
+
+  if (limit) query.push(Query.limit(limit));
+
+  const response = await database.listDocuments(
+    config.databaseId,
+    config.col.follows.id,
+    query
+  );
+
+  if (response.total === 0) return null;
+
+  return response.documents as Follow[];
+};
+
+export const fetchFollowings = async ({
+  userId,
+  limit,
+}: {
+  userId: string;
+  limit?: number;
+}) => {
+  const followsAttr = config.col.follows.attr;
+
+  const query = [Query.equal(followsAttr.followingId, userId)];
+
+  if (limit) query.push(Query.limit(limit));
+
+  const response = await database.listDocuments(
+    config.databaseId,
+    config.col.follows.id,
+    query
+  );
+
+  if (response.total === 0) return null;
+
+  return response.documents as Follow[];
+};
+
+export const handleFollow = async ({
+  myUserId,
+  userId,
+}: {
+  myUserId: string;
+  userId: string;
+}) => {
+  if (userId === myUserId) throw new Error("Both user id cannot be same");
+
+  const followsAttr = config.col.follows.attr;
+
+  const responseFollow = await database.listDocuments(
+    config.databaseId,
+    config.col.follows.id,
+    [
+      Query.and([
+        Query.equal(followsAttr.followingId, myUserId),
+        Query.equal(followsAttr.followerId, userId),
+      ]),
+      Query.limit(1),
+    ]
+  );
+
+  if (responseFollow.total === 0) {
+    return (await database.createDocument(
+      config.databaseId,
+      config.col.follows.id,
+      ID.unique(),
+      { followerId: userId, followingId: myUserId },
+      [Permission.delete(Role.user(myUserId))]
+    )) as Follow;
+  } else {
+    await database.deleteDocument(
+      config.databaseId,
+      config.col.follows.id,
+      responseFollow.documents[0].$id
+    );
+    return null;
   }
 };

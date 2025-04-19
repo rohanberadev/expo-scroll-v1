@@ -15,6 +15,8 @@ const config = {
         name: "name",
         email: "email",
         profileImage: "profileImage",
+        followerCount: "followerCount",
+        followingCount: "followingCount",
       },
     },
 
@@ -35,6 +37,14 @@ const config = {
       attr: {
         postId: "postId",
         userId: "userId",
+      },
+    },
+
+    follows: {
+      id: process.env.EXPO_PUBLIC_APPWRITE_COL_FOLLOWS!,
+      attr: {
+        followerId: "followerId",
+        followingId: "followingId",
       },
     },
   },

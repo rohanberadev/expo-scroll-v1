@@ -1,6 +1,7 @@
 export const QUERY_KEY = {
   userProfiles: "userProfiles",
   posts: "posts",
+  follows: "follows",
 } as const;
 
 export const POST_QUERY_TAG = {
@@ -10,3 +11,8 @@ export const POST_QUERY_TAG = {
   trending: "trending",
   like: "like",
 } as const;
+
+export const FOLLOWS_QUERY_TAG = {
+  following: "following",
+  follower: "follower",
+};

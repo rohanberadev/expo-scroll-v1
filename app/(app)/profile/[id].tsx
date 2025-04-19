@@ -1,3 +1,4 @@
+import { FollowButton } from "@/components/FollowButton";
 import { icons } from "@/constants/icons";
 import { images } from "@/constants/image";
 import { useFetchPostsByUserId } from "@/hooks/posts";
@@ -67,6 +68,10 @@ export default function Profile() {
               <Text className="text-lg text-white font-bold mt-1.5">
                 {userProfile?.name}
               </Text>
+
+              <View className="w-full mt-5">
+                <FollowButton othersUserId={userProfile?.userId!} />
+              </View>
             </View>
 
             <View className="w-full h-[1px] bg-gray-700 my-5"></View>

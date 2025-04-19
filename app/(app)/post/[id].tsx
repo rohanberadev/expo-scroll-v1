@@ -1,3 +1,5 @@
+import { FollowButton } from "@/components/FollowButton";
+import { MyTextInput } from "@/components/MyTextInput";
 import { icons } from "@/constants/icons";
 import { images } from "@/constants/image";
 import { useAuth } from "@/contexts/auth";
@@ -8,8 +10,8 @@ import {
 } from "@/hooks/posts";
 import { useFetchUserProfile } from "@/hooks/userProfiles";
 import { config, storage } from "@/services/appwrite";
-import { Link, Redirect, useLocalSearchParams, useRouter } from "expo-router";
-import React, { useRef, useState } from "react";
+import { Link, useLocalSearchParams, useRouter } from "expo-router";
+import React from "react";
 import {
   ActivityIndicator,
   Image,
@@ -18,6 +20,11 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { useKeyboardHandler } from "react-native-keyboard-controller";
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+} from "react-native-reanimated";
 
 export default function Post() {
   const { id } = useLocalSearchParams();
@@ -25,8 +32,7 @@ export default function Post() {
 
   const { user } = useAuth();
 
-  const [commentValue, setCommentValue] = useState("");
-  const scrollViewRef = useRef<ScrollView>(null);
+  const [commentValue, setCommentValue] = React.useState("");
 
   const {
     data: post,
@@ -52,13 +58,15 @@ export default function Post() {
       userId: user?.$id!,
     });
 
-  function scrollToTop() {
-    scrollViewRef.current?.scrollTo({ y: 0, animated: true });
-  }
+  const { height } = useGradualAnimation();
 
-  if (isPostSuccess && !post) {
-    return <Redirect href="/" />;
-  }
+  const keyboardViewStyle = useAnimatedStyle(() => {
+    return {
+      bottom: Math.abs(height.value),
+    };
+  }, []);
+
+  if (isPostSuccess && !post) return null;
 
   if (isPostLoading) {
     return (
@@ -82,7 +90,7 @@ export default function Post() {
         <Text className="text-xl text-white font-bold">Post</Text>
       </View>
 
-      <ScrollView ref={scrollViewRef}>
+      <ScrollView>
         <View className="w-full">
           <View className="w-full p-5 flex-row justify-between items-center">
             <View className="flex-row items-center gap-x-4">
@@ -122,9 +130,7 @@ export default function Post() {
               </Text>
             </View>
             {post?.userId !== user?.$id && (
-              <TouchableOpacity className="px-8 py-2 justify-center items-center bg-accent rounded-full">
-                <Text className="text-base font-bold">Follow</Text>
-              </TouchableOpacity>
+              <FollowButton othersUserId={post?.userId!} />
             )}
           </View>
 
@@ -163,26 +169,61 @@ export default function Post() {
             </TouchableOpacity>
           </View>
 
-          <View className="mt-5 w-full px-5 relative h-[3000px]">
+          <View className="mt-5 w-full px-5 relative">
             <Text className="text-xl font-bold text-white">Comments</Text>
           </View>
-
-          {/* <View className="w-full px-5 mt-10">
-          <MyTextInput
-          placeholder="Eg: I like your photo"
-          label="Enter your comment"
-          value={commentValue}
-          onChangeText={(text) => setCommentValue(text)}
-          />
-          </View> */}
         </View>
       </ScrollView>
-      <TouchableOpacity
-        className="absolute -bottom-20 left-1/2 -translate-x-1/2 z-50 w-48 bg-accent p-2 justify-center items-center rounded-full"
-        onPress={scrollToTop}
+
+      <Animated.View
+        style={[
+          {
+            flexDirection: "row",
+            zIndex: 50,
+            justifyContent: "center",
+            alignItems: "center",
+            paddingHorizontal: 16,
+            gap: 16,
+            backgroundColor: "#030014",
+            // borderWidth: 1,
+            borderTopColor: "white",
+            paddingVertical: 8,
+          },
+          keyboardViewStyle,
+        ]}
       >
-        <Text className="text-xl text-white">Back to top</Text>
-      </TouchableOpacity>
+        <MyTextInput
+          placeholder="Comment on this post"
+          value={commentValue}
+          onChangeText={(text) => setCommentValue(text)}
+          className="flex-1 flex-row"
+        />
+
+        <TouchableOpacity className="bg-accent flex-row justify-center items-center">
+          <Text>Send</Text>
+        </TouchableOpacity>
+      </Animated.View>
     </View>
   );
 }
+
+const useGradualAnimation = () => {
+  const height = useSharedValue(0);
+
+  useKeyboardHandler(
+    {
+      onMove: (e) => {
+        "worklet";
+        height.value = e.height;
+      },
+
+      onEnd: (e) => {
+        "worklet";
+        height.value = e.height;
+      },
+    },
+    []
+  );
+
+  return { height };
+};

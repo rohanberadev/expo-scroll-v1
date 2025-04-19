@@ -146,7 +146,6 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     try {
       setLoading(true);
-
       const responseUser = await account.get();
       setUser(responseUser);
     } catch (error: any) {

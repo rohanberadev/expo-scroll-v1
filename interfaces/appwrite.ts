@@ -20,3 +20,8 @@ export interface Like extends Models.Document {
   userId: string;
   postId: string;
 }
+
+export interface Follow extends Models.Document {
+  followerId: string;
+  followingId: string;
+}
