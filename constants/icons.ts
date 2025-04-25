@@ -11,6 +11,7 @@ import play from "@/assets/icons/play.png";
 import plus from "@/assets/icons/plus.png";
 import save from "@/assets/icons/save.png";
 import search from "@/assets/icons/search.png";
+import sendIcon from "@/assets/icons/send-icon.png";
 import star from "@/assets/icons/star.png";
 
 export const icons = {
@@ -28,4 +29,5 @@ export const icons = {
   chevron,
   heartFill,
   logout,
+  sendIcon,
 } as const;

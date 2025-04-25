@@ -17,7 +17,7 @@ export const useFetchFollowing = ({
 }) => {
   return useQuery({
     queryFn: () => fetchFollowing({ userId, myUserId }),
-    queryKey: [QUERY_KEY.follows, FOLLOWS_QUERY_TAG.following, userId],
+    queryKey: [QUERY_KEY.follows, FOLLOWS_QUERY_TAG.isFollowing, userId],
     enabled: Boolean(myUserId && userId),
   });
 };
@@ -33,7 +33,7 @@ export const useHandleFollow = ({
 
   const followQueryKey = [
     QUERY_KEY.follows,
-    FOLLOWS_QUERY_TAG.following,
+    FOLLOWS_QUERY_TAG.isFollowing,
     userId,
   ];
 
@@ -75,7 +75,7 @@ export const useFetchFollowings = ({
 }) => {
   return useQuery({
     queryFn: () => fetchFollowings({ userId, limit }),
-    queryKey: [QUERY_KEY.follows, FOLLOWS_QUERY_TAG.following],
+    queryKey: [QUERY_KEY.follows, FOLLOWS_QUERY_TAG.following, userId],
     initialData,
   });
 };
@@ -91,7 +91,7 @@ export const useFetchFollowers = ({
 }) => {
   return useQuery({
     queryFn: () => fetchFollowers({ userId, limit }),
-    queryKey: [QUERY_KEY.follows, FOLLOWS_QUERY_TAG.follower],
+    queryKey: [QUERY_KEY.follows, FOLLOWS_QUERY_TAG.follower, userId],
     initialData,
   });
 };

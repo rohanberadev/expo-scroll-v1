@@ -17,7 +17,9 @@ export const MyTextInput = ({
 }) => {
   return (
     <View className={`w-full flex-col gap-y-2 ${className}`}>
-      <Text className="text-sm text-white font-semibold ml-2">{label}</Text>
+      {label ? (
+        <Text className="text-sm text-white font-semibold ml-2">{label}</Text>
+      ) : null}
       <View className="bg-dark-200 rounded-lg flex-row px-2 border-[1px] border-gray-600">
         <TextInput
           className="flex-1 text-white py-4"

@@ -1,4 +1,10 @@
-import { Follow, Like, Post, UserProfile } from "@/interfaces/appwrite";
+import {
+  Follow,
+  Like,
+  Post,
+  PostComment,
+  UserProfile,
+} from "@/interfaces/appwrite";
 import { prepareNativeFile } from "@/lib/file";
 import { config, database, storage } from "@/services/appwrite";
 import { ImagePickerAsset } from "expo-image-picker";
@@ -335,4 +341,98 @@ export const handleFollow = async ({
     );
     return null;
   }
+};
+
+export const fetchComments = async ({ postId }: { postId: string }) => {
+  const commentsAttr = config.col.comments.attr;
+
+  const responseComments = await database.listDocuments(
+    config.databaseId,
+    config.col.comments.id,
+    [Query.equal(commentsAttr.postId, postId)]
+  );
+
+  if (responseComments.total === 0) return null;
+
+  return responseComments.documents as unknown as PostComment[];
+};
+
+export const fetchComment = async ({ commentId }: { commentId: string }) => {
+  const responseComment = await database.getDocument(
+    config.databaseId,
+    config.col.comments.id,
+    commentId
+  );
+
+  if (!responseComment) return null;
+
+  return responseComment as PostComment;
+};
+
+export const createComment = async ({
+  postId,
+  userId,
+  content,
+}: {
+  postId: string;
+  userId: string;
+  content: string;
+}) => {
+  if (!postId || !userId || !content) throw new Error("Invalid data");
+
+  const responsePost = (await database.getDocument(
+    config.databaseId,
+    config.col.posts.id,
+    postId
+  )) as Post;
+
+  if (!responsePost) throw new Error("Post not found");
+
+  const responseComment = await database.createDocument(
+    config.databaseId,
+    config.col.comments.id,
+    ID.unique(),
+    { postId, userId, content },
+    [Permission.delete(Role.user(userId)), Permission.update(Role.user(userId))]
+  );
+
+  await database.updateDocument(
+    config.databaseId,
+    config.col.posts.id,
+    postId,
+    { commentCount: responsePost.commentCount + 1 }
+  );
+
+  return responseComment as PostComment;
+};
+
+export const deleteComment = async ({
+  commentId,
+  postId,
+}: {
+  commentId: string;
+  postId: string;
+}) => {
+  const responsePost = (await database.getDocument(
+    config.databaseId,
+    config.col.posts.id,
+    postId
+  )) as Post;
+
+  if (!responsePost) throw new Error("Post not found");
+
+  await database.deleteDocument(
+    config.databaseId,
+    config.col.comments.id,
+    commentId
+  );
+
+  await database.updateDocument(
+    config.databaseId,
+    config.col.posts.id,
+    postId,
+    { commentCount: responsePost.commentCount - 1 }
+  );
+
+  return null;
 };

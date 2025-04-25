@@ -2,6 +2,7 @@ export const QUERY_KEY = {
   userProfiles: "userProfiles",
   posts: "posts",
   follows: "follows",
+  comments: "comments",
 } as const;
 
 export const POST_QUERY_TAG = {
@@ -15,4 +16,9 @@ export const POST_QUERY_TAG = {
 export const FOLLOWS_QUERY_TAG = {
   following: "following",
   follower: "follower",
-};
+  isFollowing: "isFollowing",
+} as const;
+
+export const COMMENT_QUERY_TAG = {
+  isCommented: "isCommented",
+} as const;

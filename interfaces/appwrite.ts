@@ -25,3 +25,9 @@ export interface Follow extends Models.Document {
   followerId: string;
   followingId: string;
 }
+
+export interface PostComment extends Models.Document {
+  postId: string;
+  userId: string;
+  content: string;
+}

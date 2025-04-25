@@ -26,6 +26,9 @@ export const useUploadPost = ({
     onSuccess: (data) => {
       const prevData = (queryClient.getQueryData(queryKey) as Post[]) ?? [];
       queryClient.setQueryData(queryKey, [data, ...prevData]);
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEY.posts, POST_QUERY_TAG.latest],
+      });
     },
   });
 };

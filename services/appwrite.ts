@@ -47,6 +47,15 @@ const config = {
         followingId: "followingId",
       },
     },
+
+    comments: {
+      id: process.env.EXPO_PUBLIC_APPWRITE_COL_COMMENTS!,
+      attr: {
+        postId: "postId",
+        userId: "userId",
+        content: "content",
+      },
+    },
   },
 };
 

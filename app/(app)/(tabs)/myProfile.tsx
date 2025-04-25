@@ -66,6 +66,11 @@ export default function MyProfile() {
         className="w-full"
         numColumns={3}
         horizontal={false}
+        ListEmptyComponent={
+          <Text className="text-lg text-light-300 font-bold self-center mt-10">
+            Nothing to see here.
+          </Text>
+        }
         ListHeaderComponent={
           <>
             <Image source={images.bg} className="absolute z-0 w-full" />
@@ -115,7 +120,7 @@ export default function MyProfile() {
             <Link
               href={{
                 pathname: "/followers/[userId]",
-                params: { userId: user?.$id },
+                params: { userId: user?.$id! },
               }}
               asChild
             >
@@ -132,14 +137,19 @@ export default function MyProfile() {
               </TouchableOpacity>
             </Link>
 
-            <ScrollView className="px-5" horizontal={true}>
+            <ScrollView
+              horizontal={true}
+              showsHorizontalScrollIndicator={false}
+            >
               {followers?.length === 0 || !followers ? (
-                <Text className="text-sm text-light-300">
+                <Text className="text-sm text-light-300 ml-5">
                   Nothing to see here.
                 </Text>
               ) : (
                 followers?.map((follower) => (
-                  <UserCard key={follower.$id} userId={follower.followingId} />
+                  <View key={follower.$id} className="ml-5">
+                    <UserCard userId={follower.followingId} />
+                  </View>
                 ))
               )}
             </ScrollView>
@@ -147,7 +157,7 @@ export default function MyProfile() {
             <Link
               href={{
                 pathname: "/followings/[userId]",
-                params: { userId: user?.$id },
+                params: { userId: user?.$id! },
               }}
               asChild
             >
@@ -164,14 +174,16 @@ export default function MyProfile() {
               </TouchableOpacity>
             </Link>
 
-            <ScrollView className="px-5" horizontal={true}>
+            <ScrollView horizontal={true}>
               {followings?.length === 0 || !followings ? (
-                <Text className="text-sm text-light-300">
+                <Text className="text-sm text-light-300 ml-5">
                   Nothing to see here.
                 </Text>
               ) : (
                 followings?.map((following) => (
-                  <UserCard key={following.$id} userId={following.followerId} />
+                  <View key={following.$id} className="ml-5">
+                    <UserCard userId={following.followerId} />
+                  </View>
                 ))
               )}
             </ScrollView>

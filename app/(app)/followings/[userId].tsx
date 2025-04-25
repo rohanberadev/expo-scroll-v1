@@ -13,24 +13,22 @@ export default function Followings() {
 
   return (
     <View className="flex-1 bg-primary">
-      <View className="flex-1 bg-primary">
-        <View className="z-50 flex-row items-center gap-x-2 border-b-[1px] border-light-300 w-full h-20">
-          <TouchableOpacity onPress={() => router.back()} className="ml-2">
-            <Image
-              source={icons.chevron}
-              className=" size-8 mt-1"
-              tintColor="#fff"
-            />
-          </TouchableOpacity>
+      <View className="z-50 flex-row items-center gap-x-2 border-b-[1px] border-light-300 w-full h-20">
+        <TouchableOpacity onPress={() => router.back()} className="ml-2">
+          <Image
+            source={icons.chevron}
+            className=" size-8 mt-1"
+            tintColor="#fff"
+          />
+        </TouchableOpacity>
 
-          <Text className="text-xl text-white font-bold">Followings</Text>
-        </View>
+        <Text className="text-xl text-white font-bold">Followers</Text>
       </View>
 
       <FlatList
         data={followings}
         keyExtractor={(item) => item.$id}
-        renderItem={({ item }) => <UserCard userId={item.followingId} />}
+        renderItem={({ item }) => <UserCard userId={item.followerId} />}
         ListEmptyComponent={
           <Text className="self-center text-lg text-light-300 font-bold">
             Nothing to see here.
