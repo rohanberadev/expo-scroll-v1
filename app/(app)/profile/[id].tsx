@@ -71,16 +71,32 @@ export default function Profile() {
             <View className="px-5 mt-20 items-center">
               <View className="reltaive">
                 <View className="size-32 overflow-hidden rounded-full border-[2px] border-white">
-                  <Image
-                    source={{ uri: userProfile?.profileImage }}
-                    className="w-full h-full"
-                  />
+                  {userProfile?.profileImage ? (
+                    <Image
+                      source={{ uri: userProfile?.profileImage }}
+                      className="w-full h-full"
+                    />
+                  ) : (
+                    <Image
+                      source={images.placeholderProfile}
+                      className="w-full h-full"
+                    />
+                  )}
                 </View>
               </View>
 
               <Text className="text-lg text-white font-bold mt-1.5">
                 {userProfile?.name}
               </Text>
+
+              <View className="flex-row gap-x-4">
+                <Text className="text-sm text-light-300 font-bold mt-1.5">
+                  Followers: {userProfile?.followerCount}
+                </Text>
+                <Text className="text-sm text-light-300 font-bold mt-1.5">
+                  Followings: {userProfile?.followingCount}
+                </Text>
+              </View>
 
               <View className="w-full mt-5">
                 <FollowButton othersUserId={userProfile?.userId!} />
@@ -114,7 +130,7 @@ export default function Profile() {
               showsHorizontalScrollIndicator={false}
             >
               {followers?.length === 0 || !followers ? (
-                <Text className="text-sm text-light-300">
+                <Text className="text-sm text-light-300 px-5">
                   Nothing to see here.
                 </Text>
               ) : (
@@ -151,7 +167,7 @@ export default function Profile() {
               showsHorizontalScrollIndicator={false}
             >
               {followings?.length === 0 || !followings ? (
-                <Text className="text-sm text-light-300 ml-5">
+                <Text className="text-sm text-light-300 px-5">
                   Nothing to see here.
                 </Text>
               ) : (
@@ -168,7 +184,7 @@ export default function Profile() {
             </View>
           </>
         }
-        ListFooterComponent={<View className="w-full h-[5000px]"></View>}
+        ListFooterComponent={<View className="w-full h-[100px]"></View>}
         showsVerticalScrollIndicator={false}
       />
     </View>

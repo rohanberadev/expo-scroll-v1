@@ -5,7 +5,7 @@ import {
   fetchFollowings,
   handleFollow,
 } from "@/data/appwrite";
-import { Follow } from "@/interfaces/appwrite";
+import { Follow, UserProfile } from "@/interfaces/appwrite";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export const useFetchFollowing = ({
@@ -58,8 +58,25 @@ export const useHandleFollow = ({
       }
     },
 
-    onSuccess: (data, variables, context) => {
+    onSuccess: async (data) => {
       queryClient.setQueryData(followQueryKey, data);
+      await queryClient.cancelQueries({
+        queryKey: [QUERY_KEY.userProfiles, userId],
+      });
+
+      const userProfile = queryClient.getQueryData([
+        QUERY_KEY.userProfiles,
+        userId,
+      ]) as UserProfile;
+
+      if (userProfile) {
+        queryClient.setQueryData([QUERY_KEY.userProfiles, userId], {
+          ...userProfile,
+          followingCount: data
+            ? userProfile.followingCount + 1
+            : userProfile.followingCount - 1,
+        });
+      }
     },
   });
 };

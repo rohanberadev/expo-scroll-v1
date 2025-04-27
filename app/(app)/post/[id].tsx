@@ -1,6 +1,7 @@
 import { CommentCard } from "@/components/CommentCard";
 import { FollowButton } from "@/components/FollowButton";
 import { MyTextInput } from "@/components/MyTextInput";
+import { PostDeleteButton } from "@/components/PostDeleteButton";
 import { icons } from "@/constants/icons";
 import { images } from "@/constants/image";
 import { useAuth } from "@/contexts/auth";
@@ -12,7 +13,7 @@ import {
 } from "@/hooks/posts";
 import { useFetchUserProfile } from "@/hooks/userProfiles";
 import { config, storage } from "@/services/appwrite";
-import { Link, useLocalSearchParams, useRouter } from "expo-router";
+import { Link, Redirect, useLocalSearchParams, useRouter } from "expo-router";
 import React from "react";
 import {
   ActivityIndicator,
@@ -84,7 +85,9 @@ export default function Post() {
     };
   }, []);
 
-  if (isPostSuccess && !post) return null;
+  if (!isPostSuccess) return null;
+
+  if (!post) return <Redirect href="/" />;
 
   if (isPostLoading) {
     return (
@@ -163,6 +166,7 @@ export default function Post() {
               {post?.userId !== user?.$id && (
                 <FollowButton othersUserId={post?.userId!} />
               )}
+              <PostDeleteButton post={post!} />
             </View>
 
             <View className="w-full">

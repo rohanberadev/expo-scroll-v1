@@ -1,5 +1,6 @@
 import { POST_QUERY_TAG, QUERY_KEY } from "@/constants/query";
 import {
+  deletePost,
   fetchLike,
   fetchPostById,
   fetchPosts,
@@ -28,6 +29,70 @@ export const useUploadPost = ({
       queryClient.setQueryData(queryKey, [data, ...prevData]);
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEY.posts, POST_QUERY_TAG.latest],
+      });
+    },
+  });
+};
+
+export const useDeletePost = ({ postId }: { postId: string }) => {
+  const queryClient = useQueryClient();
+
+  const latestPostsQueryKey = [QUERY_KEY.posts, POST_QUERY_TAG.latest];
+  const postDetailsQueryKey = [QUERY_KEY.posts, POST_QUERY_TAG.detail, postId];
+  const postsByUserIdQueryKey = [
+    QUERY_KEY.posts,
+    POST_QUERY_TAG.detail,
+    postId,
+  ];
+
+  return useMutation({
+    mutationFn: () => deletePost({ postId }),
+    onMutate: async () => {
+      await queryClient.cancelQueries({ queryKey: latestPostsQueryKey });
+      await queryClient.cancelQueries({ queryKey: postDetailsQueryKey });
+      await queryClient.cancelQueries({ queryKey: postsByUserIdQueryKey });
+
+      const prevLatestPosts =
+        (queryClient.getQueryData(latestPostsQueryKey) as Post[]) ?? [];
+      const prevPostDetails = queryClient.getQueryData(
+        postDetailsQueryKey
+      ) as Post;
+      const prevPostsByUserId =
+        (queryClient.getQueryData(postsByUserIdQueryKey) as Post[]) ?? [];
+
+      queryClient.setQueryData(
+        latestPostsQueryKey,
+        prevLatestPosts.filter((post) => post.$id !== postId)
+      );
+      queryClient.setQueryData(postDetailsQueryKey, null);
+      queryClient.setQueryData(
+        postsByUserIdQueryKey,
+        prevLatestPosts.filter((post) => post.$id !== postId)
+      );
+
+      return { prevLatestPosts, prevPostsByUserId, prevPostDetails };
+    },
+
+    onError: (error, variables, context) => {
+      if (context) {
+        queryClient.setQueryData(
+          latestPostsQueryKey,
+          context.prevLatestPosts ?? null
+        );
+        queryClient.setQueryData(
+          postDetailsQueryKey,
+          context.prevPostDetails ?? null
+        );
+        queryClient.setQueryData(
+          postsByUserIdQueryKey,
+          context.prevPostsByUserId
+        );
+      }
+    },
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEY.posts, POST_QUERY_TAG.trending],
       });
     },
   });

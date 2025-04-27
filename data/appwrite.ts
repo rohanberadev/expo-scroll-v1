@@ -82,6 +82,11 @@ export const uploadPost = async ({
   }
 };
 
+export const deletePost = async ({ postId }: { postId: string }) => {
+  await database.deleteDocument(config.databaseId, config.col.posts.id, postId);
+  return null;
+};
+
 export const fetchPosts = async ({ userId }: { userId?: string }) => {
   const query = [Query.orderDesc("$createdAt")];
 

@@ -22,7 +22,9 @@ import {
 export default function MyProfile() {
   const { signOut, user, refetchUser } = useAuth();
 
-  const { data: posts, isSuccess } = useFetchPostsByUserId({
+  const { data: userProfile } = useFetchUserProfile({ userId: user?.$id! });
+
+  const { data: posts } = useFetchPostsByUserId({
     userId: user?.$id!,
   });
 
@@ -113,6 +115,15 @@ export default function MyProfile() {
               <Text className="text-lg text-white font-bold mt-1.5">
                 {user?.name}
               </Text>
+
+              <View className="flex-row gap-x-4">
+                <Text className="text-sm text-light-300 font-bold mt-1.5">
+                  Followers: {userProfile?.followerCount}
+                </Text>
+                <Text className="text-sm text-light-300 font-bold mt-1.5">
+                  Followings: {userProfile?.followingCount}
+                </Text>
+              </View>
             </View>
 
             <View className="w-full h-[1px] bg-gray-700 my-5"></View>

@@ -5,6 +5,8 @@ export interface UserProfile extends Models.Document {
   name: string;
   email: string;
   profileImage: string;
+  followerCount: number;
+  followingCount: number;
 }
 
 export interface Post extends Models.Document {
