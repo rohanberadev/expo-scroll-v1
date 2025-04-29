@@ -37,6 +37,8 @@ yarn-error.*
 
 app-example
 
-./android
+android
 
 .env
+
+password.txt

@@ -26,7 +26,6 @@
         <category android:name="android.intent.category.DEFAULT"/>
         <category android:name="android.intent.category.BROWSABLE"/>
         <data android:scheme="myapp"/>
-        <data android:scheme="com.rohanbera123.scrollv1"/>
         <data android:scheme="com.rohanberadev.scroll"/>
       </intent-filter>
     </activity>

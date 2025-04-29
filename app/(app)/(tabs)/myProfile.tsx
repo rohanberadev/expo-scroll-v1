@@ -57,15 +57,15 @@ export default function MyProfile() {
   };
 
   return (
-    <View className="flex-1 bg-primary">
+    <View className="w-full flex-1 bg-primary">
       <FlatList
         data={posts}
         renderItem={({ item }) => (
-          <View className="h-full px-3.5 mb-8">
+          <View className="w-[33%] h-full px-3.5 mb-8">
             <PostCard post={item} />
           </View>
         )}
-        className="w-full"
+        className="flex-1 w-full"
         numColumns={3}
         horizontal={false}
         ListEmptyComponent={
@@ -214,7 +214,7 @@ export default function MyProfile() {
 const PostCard = ({ post }: { post: Post }) => {
   return (
     <Link href={{ pathname: "/post/[id]", params: { id: post.$id } }} asChild>
-      <TouchableOpacity className="w-32 overflow-hidden">
+      <TouchableOpacity className="w-full overflow-hidden">
         <Image
           source={{
             uri: post.imageId

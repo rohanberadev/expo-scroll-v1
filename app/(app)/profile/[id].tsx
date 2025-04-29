@@ -39,7 +39,7 @@ export default function Profile() {
   const { data: userProfile } = useFetchUserProfile({ userId: id as string });
 
   return (
-    <View className="flex-1 bg-primary">
+    <View className="w-full flex-1 bg-primary">
       <ImageBackground
         source={images.bg}
         className="z-50 flex-row items-center gap-x-2 w-full h-20"
@@ -57,11 +57,11 @@ export default function Profile() {
       <FlatList
         data={posts}
         renderItem={({ item }) => (
-          <View className="h-full px-3.5 mb-8">
+          <View className="w-[33%] h-full px-3.5 mb-8">
             <PostCard post={item} />
           </View>
         )}
-        className="w-full"
+        className="w-full flex-1"
         numColumns={3}
         horizontal={false}
         ListHeaderComponent={
@@ -194,7 +194,7 @@ export default function Profile() {
 const PostCard = ({ post }: { post: Post }) => {
   return (
     <Link href={{ pathname: "/post/[id]", params: { id: post.$id } }} asChild>
-      <TouchableOpacity className="w-32 overflow-hidden">
+      <TouchableOpacity className="w-full overflow-hidden">
         <Image
           source={{
             uri: post.imageId

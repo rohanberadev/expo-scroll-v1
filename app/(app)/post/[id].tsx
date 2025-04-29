@@ -204,6 +204,12 @@ export default function Post() {
               </TouchableOpacity>
             </View>
 
+            <View className="flex-row mt-5 px-5">
+              <Text className="text-sm text-white font-bold flex-1 flex-wrap">
+                Title: {post.title}
+              </Text>
+            </View>
+
             <View className="my-5 w-full px-5 relative">
               <Text className="text-xl font-bold text-white">Comments</Text>
             </View>

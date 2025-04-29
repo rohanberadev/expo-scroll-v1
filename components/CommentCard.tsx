@@ -31,7 +31,7 @@ export const CommentCard = ({ comment }: { comment: PostComment }) => {
 
   return (
     <View className="w-full flex-row items-center justify-between px-5 py-2 border-[1px] border-light-300 rounded-md my-5">
-      <View className="flex-row gap-x-10 items-center">
+      <View className="flex-1 flex-row gap-x-10 items-center">
         <View className="gap-y-1">
           <Link
             href={
@@ -62,9 +62,11 @@ export const CommentCard = ({ comment }: { comment: PostComment }) => {
             {userProfile?.name}
           </Text>
         </View>
-        <Text className="text-sm font-bold text-white">
+        {/* <View className="flex-row"> */}
+        <Text className="text-sm font-bold text-white flex-1 flex-wrap">
           {commentDetails?.content}
         </Text>
+        {/* </View> */}
       </View>
       {isCommentOwner ? (
         <TouchableOpacity onPress={() => deleteComment()}>
