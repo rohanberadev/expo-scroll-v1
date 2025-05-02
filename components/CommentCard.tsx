@@ -27,8 +27,6 @@ export const CommentCard = ({ comment }: { comment: PostComment }) => {
     postId: comment.postId,
   });
 
-  console.log({ isCommentOwner, error });
-
   return (
     <View className="w-full flex-row items-center justify-between px-5 py-2 border-[1px] border-light-300 rounded-md my-5">
       <View className="flex-1 flex-row gap-x-10 items-center">
